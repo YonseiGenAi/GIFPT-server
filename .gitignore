@@ -1,0 +1,47 @@
+# --- OS / IDE ---
+.DS_Store
+*.log
+.vscode/
+.idea/
+*.swp
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+myenv/
+*.sqlite3
+
+# --- Java / Gradle ---
+.gradle/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+
+# --- Node (만약 프론트 포함될 수도 있어서) ---
+node_modules/
+
+# --- Docker / volumes ---
+data/
+shared/uploads/
+shared/results/
+*.pid
+*.sock
+
+# --- Environment / Secrets ---
+.env
+.env.*
+*.key
+*.pem
+
+# --- Misc ---
+*.iml
+*.bak
+*.tmp
+*.cache
