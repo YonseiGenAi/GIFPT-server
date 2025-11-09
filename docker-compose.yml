@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   redis:
     image: redis:7
@@ -19,10 +17,7 @@ services:
     restart: unless-stopped
 
   spring:
-    platform: linux/amd64
-    build:
-      context: ./GIFPT-BE
-      dockerfile: Dockerfile
+    image: ehho/gifpt-spring:latest
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/gifpt?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
@@ -39,10 +34,7 @@ services:
     restart: unless-stopped
 
   django:
-    platform: linux/amd64
-    build:
-      context: ./GIFPT_AI
-      dockerfile: Dockerfile
+    image: ehho/gifpt-django:latest
     environment:
       DJANGO_DEBUG: "0"
       REDIS_URL: redis://redis:6379/0
@@ -60,8 +52,7 @@ services:
     command: bash -lc "python manage.py migrate && gunicorn GIFPT_AI.wsgi:application --bind 0.0.0.0:8000"
 
   worker:
-    platform: linux/amd64
-    build: ./GIFPT_AI
+    image: ehho/gifpt-worker:latest
     environment:
       REDIS_URL: redis://redis:6379/0
       SPRING_CALLBACK_BASE: http://spring:8080
@@ -74,4 +65,4 @@ services:
       - ./shared/results:/data/results
     depends_on: [redis, django]
     restart: unless-stopped
-    command: celery -A GIFPT_AI.celery worker -l info -Q gifpt.default
+    command: celery -A GIFPT_AI worker -l info -Q gifpt.default
