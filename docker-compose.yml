@@ -74,4 +74,4 @@ services:
       - ./shared/results:/data/results
     depends_on: [redis, django]
     restart: unless-stopped
-    command: celery -A GIFPT_AI worker -l info -Q gifpt.default
+    command: celery -A GIFPT_AI.celery worker -l info -Q gifpt.default
