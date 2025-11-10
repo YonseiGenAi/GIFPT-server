@@ -45,3 +45,4 @@ shared/results/
 *.bak
 *.tmp
 *.cache
+.DS_Store
