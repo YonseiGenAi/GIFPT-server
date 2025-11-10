@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   redis:
     image: redis:7
@@ -19,7 +17,7 @@ services:
     restart: unless-stopped
 
   spring:
-    build: ./spring
+    image: ehho/gifpt-spring:latest
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/gifpt?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
@@ -36,7 +34,7 @@ services:
     restart: unless-stopped
 
   django:
-    build: ./gifpt_ai
+    image: ehho/gifpt-django:latest
     environment:
       DJANGO_DEBUG: "0"
       REDIS_URL: redis://redis:6379/0
@@ -51,10 +49,10 @@ services:
     depends_on: [redis]
     ports: ["8000:8000"]
     restart: unless-stopped
-    command: bash -lc "python manage.py migrate && gunicorn gifpt_ai.wsgi:application --bind 0.0.0.0:8000"
+    command: bash -lc "python manage.py migrate && gunicorn GIFPT_AI.wsgi:application --bind 0.0.0.0:8000"
 
   worker:
-    build: ./gifpt_ai
+    image: ehho/gifpt-worker:latest
     environment:
       REDIS_URL: redis://redis:6379/0
       SPRING_CALLBACK_BASE: http://spring:8080
@@ -67,4 +65,17 @@ services:
       - ./shared/results:/data/results
     depends_on: [redis, django]
     restart: unless-stopped
-    command: celery -A gifpt_ai worker -l info -Q gifpt.default
+    command: celery -A GIFPT_AI worker -l info -Q gifpt.default
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: gifpt-server-nginx
+    depends_on: [spring, django]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/certbot/www:/var/www/certbot
+      - ./nginx/letsencrypt:/etc/letsencrypt
+    restart: unless-stopped
