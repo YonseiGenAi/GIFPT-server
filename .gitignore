@@ -45,3 +45,7 @@ shared/results/
 *.bak
 *.tmp
 *.cache
+
+# macOS
+.DS_Store
+**/.DS_Store
