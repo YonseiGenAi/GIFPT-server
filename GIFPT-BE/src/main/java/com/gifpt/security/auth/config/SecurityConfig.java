@@ -50,15 +50,22 @@ public class SecurityConfig {
       .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
       .authorizeHttpRequests(auth -> auth
         .requestMatchers(
+          // health
           "/healthz",
           "/actuator/health", "/actuator/health/**",
-          "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
-          "/api/v1/auth/**", "/api/v1/analysis/*/complete"
+
+          // Swagger / OpenAPI
+          "/swagger-ui.html", "/swagger-ui/**",
+          "/v3/api-docs", "/v3/api-docs/**",
+
+          // 인증/콜백
+          "/api/v1/auth/**",
+          "/api/v1/analysis/*/complete"
         ).permitAll()
         .anyRequest().authenticated()
       )
       .httpBasic(Customizer.withDefaults())
-      .authenticationProvider(authenticationProvider()) // ← 변경된 빈 주입
+      .authenticationProvider(authenticationProvider())
       .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
